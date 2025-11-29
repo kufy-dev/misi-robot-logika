@@ -31,7 +31,7 @@ Game ini bertujuan untuk:
 
 ## 🕹️ Cara Bermain
 1. Jalankan game di browser:  
-   👉 [https://USERNAME.github.io/misi-robot-logika/](https://kufytrade.github.io/misi-robot-logika/)
+   👉 [https://kufy-dev.github.io/misi-robot-logika/](https://kufy-dev.github.io/misi-robot-logika/)
 2. Baca instruksi di panel kanan.
 3. Susun perintah (Maju, Kiri, Kanan) sesuai logika menuju 🏁.
 4. Tekan **JALANKAN** untuk mengeksekusi urutan langkah.
