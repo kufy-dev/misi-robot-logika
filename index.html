@@ -213,7 +213,7 @@
             // === 1. DEFINISI STATE GAME ===
 
             // Kunci API (kosongkan, akan diisi oleh runtime)
-            const apiKey = "AIzaSyDD-LfEdVbMbfkFIRIoS0sfBRjko9DzHZA"; // JANGAN DIISI: Biarkan kosong
+            const apiKey = ""; // Jangan simpan API key rahasia di frontend/public HTML.
 
             const gameGrid = document.getElementById('game-grid');
             const playerElement = document.getElementById('player');
@@ -309,16 +309,20 @@
                     description: "Lihat jalurnya? Ada <strong class='text-white'>POLA</strong> yang berulang. Anda harus mengulang 'Maju', 'Maju', 'Putar Kanan' sebanyak 3 kali. Sayang sekali tombol 'Ulangi' rusak! Lakukan secara manual untuk merasakan polanya.",
                     startPos: { x: 2, y: 7 },
                     startDir: 0,
+                    // FIX LEVEL 3:
+                    // Pola "Maju, Maju, Putar Kanan" x3 sekarang
+                    // benar-benar membawa robot ke bendera.
+                    // Start (2,7) -> (2,5) -> (4,5) -> (4,7).
                     grid: [
                         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                        [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-                        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
-                        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
                         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
-                        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
-                        [1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
-                        [1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+                        [1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+                        [1, 1, 0, 1, 2, 1, 1, 1, 1, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                     ]
                 },
@@ -507,6 +511,7 @@
 
                 // Variabel untuk state level
                 let hasKey = false;
+                let reachedGoal = false;
                 // PENTING: Mutasi grid saat ini, resetGame akan mengembalikannya
                 const levelData = levels[currentLevel].grid; 
 
@@ -554,11 +559,12 @@
                                     playerPos = { x: nextX, y: nextY };
                                     break;
                                 case 2: // Bendera (Tujuan)
+                                    // Tandai tujuan tercapai, tetapi jangan langsung
+                                    // menghentikan antrian. Ini memungkinkan pola
+                                    // "Maju, Maju, Putar Kanan" x3 selesai utuh.
                                     playerPos = { x: nextX, y: nextY };
-                                    updatePlayerPosition();
-                                    await sleep(200);
-                                    winExecution();
-                                    return;
+                                    reachedGoal = true;
+                                    break;
                                 case 0: // Kosong
                                 case 6: // Lumpur (Aman dilewati)
                                     playerPos = { x: nextX, y: nextY };
@@ -577,8 +583,12 @@
                     updatePlayerPosition();
                 }
 
-                // Selesai eksekusi tapi belum di bendera
-                if (levels[currentLevel].grid[playerPos.y][playerPos.x] !== 2) {
+                // Menang hanya setelah seluruh antrian selesai dan
+                // posisi akhir berada di bendera.
+                if (reachedGoal && levels[currentLevel].grid[playerPos.y][playerPos.x] === 2) {
+                    await sleep(200);
+                    winExecution();
+                } else {
                     failExecution("Robot belum sampai di bendera (🏁). Coba lagi!");
                 }
             }
